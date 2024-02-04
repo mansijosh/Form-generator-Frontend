@@ -33,6 +33,11 @@ const componentIcons = {
   'QR Code': <QrCodeIcon fontSize="small" />,
 };
 
+const cleanHtml = (html) => {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.textContent || '';
+};
+
 const CreateFormPage = ({ editMode, initialFormData }) => {
   const navigate = useNavigate();
   const [undoStack, setUndoStack] = useState([]);
@@ -263,6 +268,7 @@ const CreateFormPage = ({ editMode, initialFormData }) => {
                   value={component.question}
                   onChange={(value) => handleQuestionChange(componentIndex, value)}
                 />
+                
               </div>
               <div>
                 <label>Answer:</label>
