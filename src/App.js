@@ -5,7 +5,7 @@ import { Container, AppBar, Toolbar, Typography } from '@mui/material';
 import Home from './components/Home';
 import CreateFormPage from './components/CreateFormPage';
 import FormsList from './components/FormsList'; 
-import EditForm from './components/EditForm';
+import EditForm from './components/EditFormPage';
 
 
 function App() {
