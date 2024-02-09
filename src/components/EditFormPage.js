@@ -20,6 +20,7 @@ import {
   Box,
 } from '@mui/material';
 import RichTextEditor from './RichTextEditor';
+import { Divider } from '@mui/material';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -63,22 +64,27 @@ const EditFormPage = () => {
   const [formData, setFormData] = useState({
     formTitle: 'Title', // Display loading until the form details are fetched
     components: [],
+    questions: [],
+    form_id: '',
+    form_title: '',
   });
 
   const [savedSuccessfully, setSavedSuccessfully] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api2/get-forms/${formId}');
-        const formDetails = response.data;
+        const response = await axios.get(`http://127.0.0.1:8000/apii/get_form/${formId}`);
+        const data = response.data;
 
-        setFormData({
-          formTitle: formDetails.form_title,
-          components: formDetails.components,
-        });
+        console.log('Form Data:', data);
+
+        setFormData(data);
       } catch (error) {
         console.error('Error fetching form data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -105,28 +111,20 @@ const EditFormPage = () => {
       return { ...prevData, components: updatedComponents };
     });
   };
+  
+  
+  
 
-  const handleSaveForm = async () => {
+  const handleSave = async () => {
+    console.log('Form Data to be sent:', formData);
     try {
-      const response = await axios.post('http://localhost:8000/api/create_form/', {
-        formTitle: formData.formTitle,
-        components: formData.components,
-      });
-  
-      console.log('response=', response);
-  
-      if (response.data.message) {
-        alert(response.data.message);
-        const formId = response.data.formId;
-        const link = `http://localhost:3000/form/${formId}`;
-        setFormLink(link);
-        setPublished(true);
-        window.location.href = link;
-      }
+      const response = await axios.put(`http://127.0.0.1:8000/apii/edit_form/${formId}`, formData);
+      console.log('Form updated successfully:', response.data);
     } catch (error) {
-      console.error('Error saving form data:', error);
+      console.error('Error updating form:', error);
     }
   };
+  
   
   const handlePublishForm = async () => {
     try {
@@ -160,14 +158,17 @@ const EditFormPage = () => {
       answer: '',
       options: componentType === 'Multiple-Choice Grid' || componentType === 'Tick-Box Grid' ? ['Option 1'] : [],
       displayNames: componentType === 'Multiple-Choice Grid' || componentType === 'Tick-Box Grid' ? ['Option 1'] : [],
+      questions: [], 
     };
+   
 
     setFormData((prevData) => {
+      const prevComponents = prevData.components || []; // Ensure prevData.components is defined
       const newFormData = {
         ...prevData,
-        components: [...prevData.components, newComponent],
+        components: [...prevComponents, newComponent],
       };
-
+  
       setUndoStack((prevUndoStack) => [...prevUndoStack, prevData]); // Save the previous state to the undo stack
       return newFormData;
     });
@@ -260,7 +261,7 @@ const EditFormPage = () => {
     }));
   };
 
- const renderFormComponents = () => {
+  const renderFormComponents = () => {
     return (
       formData.components &&
       formData.components.length > 0 &&
@@ -294,191 +295,191 @@ const EditFormPage = () => {
               <ArrowDownwardIcon />
             </Button>
             
-          {component.type === 'Text Paragraph' && (
-            <div>
+            {component.type === 'Text Paragraph' && (
               <div>
-                <label>Question:</label>
-                <RichTextEditor
-                  theme="snow"
-                  value={component.question}
-                  onChange={(value) => handleQuestionChange(componentIndex, value)}
-                />
-              </div>
-              <div>
-                <label>Answer:</label>
-                <RichTextEditor
-                  theme="snow"
-                  value={component.answer}
-                  onChange={(value) => handleAnswerChange(componentIndex, value)}
-                />
-              </div>
-            </div>
-          )}
-
-          {['Radio Button', 'Checkbox', 'Multiple-Choice Grid', 'Tick-Box Grid', 'Drop-down'].includes(component.type) && (
-            <div>
-              <div>
-                <label>Question:</label>
-                <RichTextEditor
-                  theme="snow"
-                  value={component.question}
-                  onChange={(value) => handleQuestionChange(componentIndex, value)}
-                />
-              </div>
-              <div>
-              {component.type === 'Radio Button' && (
-              <div>
-                {component.options.map((option, optionIndex) => (
-                  <div key={optionIndex} style={{ marginBottom: '10px' }}>
-                    <FormControlLabel
-                      control={
-                        <Radio
-                          checked={option}
-                          onChange={(e) => handleOptionCheckboxChange(componentIndex, optionIndex, e.target.checked)}
-                        />
-                      }
-                      label={
-                        <div>
-                          <input
-                            type="text"
-                            value={component.displayNames[optionIndex]}
-                            onChange={(e) => handleOptionChange(componentIndex, optionIndex, e.target.value)}
-                          />
-                        </div>
-                      }
-                    />
-                  </div>
-                ))}
-                <Button variant="outlined" size="small" onClick={() => handleAddOption(componentIndex)}>
-                  Add Option
-                </Button>
+                <div>
+                  <label>Question:</label>
+                  <RichTextEditor
+                    theme="snow"
+                    value={component.question}
+                    onChange={(value) => handleQuestionChange(componentIndex, value)}
+                  />
+                </div>
+                <div>
+                  <label>Answer:</label>
+                  <RichTextEditor
+                    theme="snow"
+                    value={component.answer}
+                    onChange={(value) => handleAnswerChange(componentIndex, value)}
+                  />
+                </div>
               </div>
             )}
 
-
-                {component.type === 'Checkbox' && (
-                  <div>
-                    {component.options.map((option, optionIndex) => (
-                      <div key={optionIndex} style={{ marginBottom: '10px' }}>
-                        <FormControlLabel
-                          control={<MuiCheckbox checked={option} onChange={(e) => handleOptionCheckboxChange(componentIndex, optionIndex, e.target.checked)} />}
-                          label={
-                            <div>
-                              <input
-                                type="text"
-                                value={component.displayNames[optionIndex]}
-                                onChange={(e) => handleOptionChange(componentIndex, optionIndex, e.target.value)}
+            {['Radio Button', 'Checkbox', 'Multiple-Choice Grid', 'Tick-Box Grid', 'Drop-down'].includes(component.type) && (
+              <div>
+                <div>
+                  <label>Question:</label>
+                  <RichTextEditor
+                    theme="snow"
+                    value={component.question}
+                    onChange={(value) => handleQuestionChange(componentIndex, value)}
+                  />
+                </div>
+                <div>
+                  {component.type === 'Radio Button' && (
+                    <div>
+                      {component.options.map((option, optionIndex) => (
+                        <div key={optionIndex} style={{ marginBottom: '10px' }}>
+                          <FormControlLabel
+                            control={
+                              <Radio
+                                checked={option}
+                                onChange={(e) => handleOptionCheckboxChange(componentIndex, optionIndex, e.target.checked)}
                               />
-                            </div>
-                          }
-                        />
-                      </div>
-                    ))}
-                    <Button variant="outlined" size="small" onClick={() => handleAddOption(componentIndex)}>
-                      Add Option
-                    </Button>
-                  </div>
-                )}
-
-                {['Multiple-Choice Grid', 'Tick-Box Grid', 'Drop-down'].includes(component.type) && (
-                  <div>
-                    {component.options.map((option, optionIndex) => (
-                      <div key={optionIndex} style={{ marginBottom: '10px' }}>
-                        {component.type === 'Drop-down' ? (
-                          <TextField
-                            style={{ marginTop: 7 }}
-                            label={`Option ${optionIndex + 1}`}
-                            value={option}
-                            onChange={(e) => handleOptionChange(componentIndex, optionIndex, e.target.value)}
+                            }
+                            label={
+                              <div>
+                                <input
+                                  type="text"
+                                  value={component.displayNames[optionIndex]}
+                                  onChange={(e) => handleOptionChange(componentIndex, optionIndex, e.target.value)}
+                                />
+                              </div>
+                            }
                           />
-                        ) : (
-                          <>
-                            <InputLabel>{`Option ${optionIndex + 1}:`}</InputLabel>
-                            <RichTextEditor
-                              theme="snow"
+                        </div>
+                      ))}
+                      <Button variant="outlined" size="small" onClick={() => handleAddOption(componentIndex)}>
+                        Add Option
+                      </Button>
+                    </div>
+                  )}
+
+
+                  {component.type === 'Checkbox' && (
+                    <div>
+                      {component.options.map((option, optionIndex) => (
+                        <div key={optionIndex} style={{ marginBottom: '10px' }}>
+                          <FormControlLabel
+                            control={<MuiCheckbox checked={option} onChange={(e) => handleOptionCheckboxChange(componentIndex, optionIndex, e.target.checked)} />}
+                            label={
+                              <div>
+                                <input
+                                  type="text"
+                                  value={component.displayNames[optionIndex]}
+                                  onChange={(e) => handleOptionChange(componentIndex, optionIndex, e.target.value)}
+                                />
+                              </div>
+                            }
+                          />
+                        </div>
+                      ))}
+                      <Button variant="outlined" size="small" onClick={() => handleAddOption(componentIndex)}>
+                        Add Option
+                      </Button>
+                    </div>
+                  )}
+
+                  {['Multiple-Choice Grid', 'Tick-Box Grid', 'Drop-down'].includes(component.type) && (
+                    <div>
+                      {component.options.map((option, optionIndex) => (
+                        <div key={optionIndex} style={{ marginBottom: '10px' }}>
+                          {component.type === 'Drop-down' ? (
+                            <TextField
+                              style={{ marginTop: 7 }}
+                              label={`Option ${optionIndex + 1}`}
                               value={option}
-                              onChange={(value) => handleOptionChange(componentIndex, optionIndex, value)}
+                              onChange={(e) => handleOptionChange(componentIndex, optionIndex, e.target.value)}
                             />
-                          </>
-                        )}
-                      </div>
-                    ))}
-                    <Button variant="outlined" size="small" onClick={() => handleAddOption(componentIndex)}>
-                      Add Option
-                    </Button>
-                  </div>
-                )}
+                          ) : (
+                            <>
+                              <InputLabel>{`Option ${optionIndex + 1}:`}</InputLabel>
+                              <RichTextEditor
+                                theme="snow"
+                                value={option}
+                                onChange={(value) => handleOptionChange(componentIndex, optionIndex, value)}
+                              />
+                            </>
+                          )}
+                        </div>
+                      ))}
+                      <Button variant="outlined" size="small" onClick={() => handleAddOption(componentIndex)}>
+                        Add Option
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {['Add Image', 'File Upload', 'Date', 'Time', 'QR Code'].includes(component.type) && (
-            <div>
+            {['Add Image', 'File Upload', 'Date', 'Time', 'QR Code'].includes(component.type) && (
               <div>
-                <label>Question:</label>
-                <RichTextEditor
-                  theme="snow"
-                  value={component.question}
-                  onChange={(value) => handleQuestionChange(componentIndex, value)}
-                />
+                <div>
+                  <label>Question:</label>
+                  <RichTextEditor
+                    theme="snow"
+                    value={component.question}
+                    onChange={(value) => handleQuestionChange(componentIndex, value)}
+                  />
+                </div>
+                <div>
+                  {component.type === 'Add Image' && (
+                    <div>
+                      <InputLabel>Click to Upload Image:</InputLabel>
+                      <input type="file" onChange={(e) => handleOptionChange(componentIndex, 0, e.target.files[0])} />
+                    </div>
+                  )}
+
+                  {component.type === 'File Upload' && (
+                    <div>
+                      <InputLabel>Click to Upload File:</InputLabel>
+                      <input type="file" onChange={(e) => handleOptionChange(componentIndex, 0, e.target.files[0])} />
+                    </div>
+                  )}
+
+                  {component.type === 'Date' && (
+                    <div>
+                      <InputLabel>Select Date:</InputLabel>
+                      <TextField
+                        type="date"
+                        value={component.options[0]}
+                        onChange={(e) => handleOptionChange(componentIndex, 0, e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {component.type === 'Time' && (
+                    <div>
+                      <InputLabel>Select Time:</InputLabel>
+                      <TextField
+                        type="time"
+                        value={component.options[0]}
+                        onChange={(e) => handleOptionChange(componentIndex, 0, e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {component.type === 'QR Code' && (
+                    <div>
+                      <InputLabel>QR Code Content:</InputLabel>
+                      <TextField
+                        value={component.options[0]}
+                        onChange={(e) => handleOptionChange(componentIndex, 0, e.target.value)}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-              <div>
-                {component.type === 'Add Image' && (
-                  <div>
-                    <InputLabel>Click to Upload Image:</InputLabel>
-                    <input type="file" onChange={(e) => handleOptionChange(componentIndex, 0, e.target.files[0])} />
-                  </div>
-                )}
+            )}
 
-                {component.type === 'File Upload' && (
-                  <div>
-                    <InputLabel>Click to Upload File:</InputLabel>
-                    <input type="file" onChange={(e) => handleOptionChange(componentIndex, 0, e.target.files[0])} />
-                  </div>
-                )}
-
-                {component.type === 'Date' && (
-                  <div>
-                    <InputLabel>Select Date:</InputLabel>
-                    <TextField
-                      type="date"
-                      value={component.options[0]}
-                      onChange={(e) => handleOptionChange(componentIndex, 0, e.target.value)}
-                    />
-                  </div>
-                )}
-
-                {component.type === 'Time' && (
-                  <div>
-                    <InputLabel>Select Time:</InputLabel>
-                    <TextField
-                      type="time"
-                      value={component.options[0]}
-                      onChange={(e) => handleOptionChange(componentIndex, 0, e.target.value)}
-                    />
-                  </div>
-                )}
-
-                {component.type === 'QR Code' && (
-                  <div>
-                    <InputLabel>QR Code Content:</InputLabel>
-                    <TextField
-                      value={component.options[0]}
-                      onChange={(e) => handleOptionChange(componentIndex, 0, e.target.value)}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          <Button variant="outlined" size="small" onClick={() => handleRemoveComponent(componentIndex)}>
-            Remove
-          </Button>
-        </Paper>
-      </Grid>
+            <Button variant="outlined" size="small" onClick={() => handleRemoveComponent(componentIndex)}>
+              Remove
+            </Button>
+          </Paper>
+        </Grid>
       )
-    ));
+      ));
   };
 
   const componentsList = [
@@ -505,6 +506,7 @@ const EditFormPage = () => {
   };
 
 
+  
   return (
     <Grid container spacing={2}>
       <Grid item xs={3} style={{ borderRight: '1px solid #ccc', padding: '20px' }}>
@@ -521,17 +523,17 @@ const EditFormPage = () => {
           </Button>
         ))}
       </Grid>
-
+  
       <Grid item xs={8} style={{ margin: '0 auto', paddingLeft: '80px', paddingRight: '80px' }}>
         <Box position="absolute" top={80} right={10} display="flex" flexDirection="column">
-          <Button variant="contained" color="primary" onClick={handleSaveForm}>
+          <Button variant="contained" color="primary" onClick={handleSave}>
             Save
           </Button>
           <Button variant="contained" color="primary" onClick={handleUndo} style={{ marginTop: '10px' }}>
             Undo
           </Button>
         </Box>
-
+  
         <Grid style={{ border: '1px solid #f1f1f1', padding: 10, borderRadius: 15, backgroundColor: '#f1f1f1' }}>
           <Typography style={{ fontSize: 30 }}>Form Title</Typography>
           <TextField
@@ -539,12 +541,13 @@ const EditFormPage = () => {
             variant="outlined"
             fullWidth
             margin="normal"
-            value={formData.formTitle}
+            value={formData.form_title}
             onChange={(e) => handleFormTitleChange(e.target.value)}
             style={{ fontSize: '50px', background: '#f1f1f1', color: 'white', border: '2px solid' }}
           />
         </Grid>
-
+  
+        {/* Conditional rendering based on the existence of components */}
         {(formData.components && formData.components.length === 0) ? (
           <Typography variant="body2" style={{ textAlign: 'center', fontStyle: 'italic' }}>
             Select a component to start editing
@@ -554,9 +557,43 @@ const EditFormPage = () => {
             {renderFormComponents()}
           </Grid>
         )}
+        
+        {/* Display Questions */}
+        {formData.questions && formData.questions.length > 0 && (
+          <>
+            {formData.questions.map((question, index) => (
+              <div key={index} style={{ marginBottom: '20px' }}>
+                <Typography variant="subtitle1" style={{ color: '#555', fontWeight: 'bold' }}>
+                  {`Question ${index + 1}`}
+                </Typography>
+                <TextField
+                  label="Question Title"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  value={question.title}
+                  onChange={(e) => handleQuestionChange(index, 'title', e.target.value)}
+                />
+                <TextField
+                  label="Question Text"
+                  variant="outlined"
+                  fullWidth
+                  multiline
+                  rows={3}
+                  margin="normal"
+                  value={question.question}
+                  onChange={(e) => handleQuestionChange(index, 'question', e.target.value)}
+                />
+                <Divider />
+              </div>
+            ))}
+            <Button variant="contained" color="primary" onClick={handleSave}>
+              Save
+            </Button>
+          </>
+        )}
       </Grid>
     </Grid>
   );
-};
-
+}  
 export default EditFormPage;
