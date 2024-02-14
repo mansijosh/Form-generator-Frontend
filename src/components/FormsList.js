@@ -66,6 +66,11 @@ const FormsList = () => {
                         Edit
                       </Button>
                     </Link>
+                    <Link to={`/renderform/${form.form_id}`}>
+                      <Button variant="outlined" color="secondary">
+                        Publish
+                      </Button>
+                    </Link>
                     {form.questions.length > 0 && (
                       <Link to={`/responses/${form.form_id}`}>
                         <Button variant="outlined" color="secondary" style={{ marginLeft: '10px' }}>
