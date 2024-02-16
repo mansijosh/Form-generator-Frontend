@@ -1,8 +1,7 @@
 // EditFormPage.js
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link ,useParams } from 'react-router-dom';
 import axios from 'axios';
-import CreateFormPage from './CreateFormPage'; // Replace with the correct path if needed
 
 import {
   Typography,
@@ -499,15 +498,21 @@ const EditFormPage = () => {
   const renderComponent = (componentType) => {
     return (
       <div>
+
         {componentIcons[componentType]}
         <Typography variant="subtitle2">{componentType}</Typography>
       </div>
+     
     );
   };
 
 
   
   return (
+    <div>
+    <nav>
+        <Link to="/">Home</Link>
+      </nav>
     <Grid container spacing={2}>
       <Grid item xs={3} style={{ borderRight: '1px solid #ccc', padding: '20px' }}>
         <Typography variant="h6">Form Components</Typography>
@@ -566,14 +571,7 @@ const EditFormPage = () => {
                 <Typography variant="subtitle1" style={{ color: '#555', fontWeight: 'bold' }}>
                   {`Question ${index + 1}`}
                 </Typography>
-                <TextField
-                  label="Question Title"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  value={question.title}
-                  onChange={(e) => handleQuestionChange(index, 'title', e.target.value)}
-                />
+              
                 <TextField
                   label="Question Text"
                   variant="outlined"
@@ -594,6 +592,7 @@ const EditFormPage = () => {
         )}
       </Grid>
     </Grid>
+    </div>
   );
 }  
 export default EditFormPage;

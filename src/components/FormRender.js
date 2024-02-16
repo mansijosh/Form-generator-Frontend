@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { Link ,useParams } from 'react-router-dom';
 
 const YourComponent = () => {
   const { formId } = useParams();
@@ -71,18 +71,27 @@ const YourComponent = () => {
 
 
   return (
+    <div>
+    <nav>
+        <Link to="/">Home</Link>
+      </nav>
     <div style={{ textAlign: 'center', marginTop: '50px', fontFamily: 'Arial, sans-serif', display: 'flex', justifyContent: 'center' }}>
       <div style={{ maxWidth: '600px', width: '100%' }}>
-        <h1 style={{ fontSize: '24px', marginBottom: '20px', color: '#4285F4' }}>{formData?.form_title || 'Student Club Form'}</h1>
-
+      
         {loading ? (
-          <p>Loading...</p>
-        ) : formData ? (
-          <div>
-            {submissionStatus === 'success' && <p style={{ color: 'green' }}>Form submitted successfully!</p>}
-            {submissionStatus === 'error' && <p style={{ color: 'red' }}>Error submitting form. Please try again.</p>}
-
-            <form onSubmit={handleSubmit}>
+        <p>Loading...</p>
+      ) : submissionStatus === 'success' ? (
+        <div>
+          <p style={{ color: 'green' }}>Form submitted successfully!</p>
+        </div>
+      ) : submissionStatus === 'error' ? (
+        <div>
+          <p style={{ color: 'red' }}>Error submitting form. Please try again.</p>
+        </div>
+      ) : formData ? (
+        <div>
+          <h1 style={{ fontSize: '24px', marginBottom: '20px', color: '#4285F4' }}>{formData.form_title || 'Student Club Form'}</h1>
+          <form onSubmit={handleSubmit}>
                <input type="hidden" name="form_id" value={formData.form_id} />
 
             <ul style={{ listStyleType: 'none', padding: '0', textAlign: 'left' }}>
@@ -205,6 +214,7 @@ const YourComponent = () => {
           <p>No form data found</p>
         )}
       </div>
+    </div>
     </div>
   );
 };

@@ -7,6 +7,7 @@ import CreateFormPage from './components/CreateFormPage';
 import FormsList from './components/FormsList'; 
 import EditForm from './components/EditFormPage';
 import RenderForm from './components/FormRender';
+import FormResponses from './components/FormResponses';
 
 
 
@@ -29,6 +30,7 @@ function App() {
             <Route path="/forms" element={<FormsList />} />
             <Route path="/editform/:formId" element={<EditForm />} />
             <Route path="/renderform/:formId" element={<RenderForm />} />
+            <Route path="/form-responses/:formId" element={<FormResponses/>} />
           </Routes>
         </div>
       </Container>

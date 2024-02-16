@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Paper, Button, Typography,  Grid , Divider, Container } from '@mui/material';
+import { Paper, Button, Typography, Grid, Divider, Container } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -67,13 +67,13 @@ const FormsList = () => {
                       </Button>
                     </Link>
                     <Link to={`/renderform/${form.form_id}`}>
-                      <Button variant="outlined" color="secondary">
+                      <Button variant="outlined" color="primary" style={{ marginLeft: '10px' }}>
                         Publish
                       </Button>
                     </Link>
                     {form.questions.length > 0 && (
-                      <Link to={`/responses/${form.form_id}`}>
-                        <Button variant="outlined" color="secondary" style={{ marginLeft: '10px' }}>
+                      <Link to={`/form-responses/${form.form_id}`}>
+                        <Button variant="outlined" color="primary" style={{ marginLeft: '10px' }}>
                           Responses
                         </Button>
                       </Link>
@@ -82,7 +82,7 @@ const FormsList = () => {
                 </div>
               </Paper>
             </div>
-          ))}
+          )).reverse()}
         </div>
       )}
     </Container>

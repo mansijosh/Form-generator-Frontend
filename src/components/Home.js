@@ -32,9 +32,7 @@ const Home = () => {
         <Button variant="outlined" size="small" sx={{ color: 'navy', borderColor: 'navy', marginRight: 1 }}>
           Active Forms
         </Button>
-        <Button variant="outlined" size="small" sx={{ color: 'navy', borderColor: 'navy', marginRight: 1 }}>
-          Published Forms
-        </Button>
+    
         <Button variant="outlined" size="small" sx={{ color: 'navy', borderColor: 'navy' }}>
           Closed Forms
         </Button>

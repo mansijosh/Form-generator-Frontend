@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { Typography, Button, Paper, Grid, Radio, FormControlLabel, Checkbox as MuiCheckbox, RadioGroup as MuiRadioGroup, Select, MenuItem, InputLabel, TextField, Box } from '@mui/material';
@@ -82,16 +82,17 @@ const CreateFormPage = ({ editMode, initialFormData }) => {
   
       if (response.data.message) {
         alert(response.data.message);
-        const formId = response.data.formId;
-        const link = `http://localhost:3000/form/${formId}`;
-        setFormLink(link);
+  
         setPublished(true);
-        window.location.href = link;
+  
+        // Redirect to the home page instead of the form link
+        window.location.href = 'http://localhost:3000';  // Replace with your home page URL
       }
     } catch (error) {
       console.error('Error saving form data:', error);
     }
   };
+  
   
   const handlePublishForm = async () => {
     try {
@@ -227,6 +228,7 @@ const CreateFormPage = ({ editMode, initialFormData }) => {
 
  const renderFormComponents = () => {
     return (
+      
       formData.components &&
       formData.components.length > 0 &&
       formData.components.map((component, componentIndex) => (
@@ -472,6 +474,11 @@ const CreateFormPage = ({ editMode, initialFormData }) => {
 
 
   return (
+    <div>
+    <nav>
+        <Link to="/">Home</Link>
+      </nav>
+
     <Grid container spacing={2}>
       <Grid item xs={3} style={{ borderRight: '1px solid #ccc', padding: '20px' }}>
         <Typography variant="h6">Form Components</Typography>
@@ -522,6 +529,7 @@ const CreateFormPage = ({ editMode, initialFormData }) => {
         )}
       </Grid>
     </Grid>
+    </div>
   );
 };
 
